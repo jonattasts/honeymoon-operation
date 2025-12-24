@@ -242,6 +242,19 @@ button.enabled {
   border: 1px solid #2b78d6;
 }
 
+.btn-danger-outline,
+.btn-danger-outline:focus {
+  background: #ffffff;
+  border: 1px solid #ec3343;
+  color: #ec3343;
+}
+
+.btn-danger-outline:active,
+.btn-danger-outline:hover {
+  background-color: #e85c68;
+  color: #ffffff;
+}
+
 /* Loader */
 .loader {
   width: 20px;
@@ -442,6 +455,10 @@ div.ranking-player-name {
 div#winnerMessage .form-wrapper,
 div#gameOverMessage .form-wrapper {
   will-change: opacity, transform; /* Otimização de performance para o navegador */
+}
+
+#resetGameBtn {
+  margin-top: 25px;
 }
 
 @keyframes fadeIn {

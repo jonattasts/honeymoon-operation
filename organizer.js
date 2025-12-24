@@ -1,10 +1,10 @@
 import {
   collection,
   getDocs,
-  updateDoc,
   doc,
   setDoc,
   runTransaction,
+  writeBatch,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import { firestore } from "./firebase.js";
@@ -15,6 +15,7 @@ const lastNumbersContainer = document.getElementById("lastNumbersContainer");
 const rankingList = document.getElementById("organizerRankingList");
 const drawBtn = document.getElementById("drawNumberBtn");
 const updateBtn = document.getElementById("updateOrganizerBtn");
+const resetBtn = document.getElementById("resetGameBtn");
 let isProcessing = false;
 
 // 🔥 SOLUÇÃO MANTIDA: Garantindo que o botão inicie visível para permitir a carga mesmo sem jogadores
@@ -348,6 +349,23 @@ async function handleDrawClick() {
   }
 }
 
+async function handleResetClick() {
+  const confirmReset = confirm(
+    "TEM CERTEZA? Isso excluirá todos os jogadores, sorteios e o organizador atual."
+  );
+
+  if (confirmReset) {
+    resetBtn.disabled = true;
+    resetBtn.textContent = "";
+    resetBtn.appendChild(createLoader("sort"));
+
+    await clearAllCollections();
+
+    localStorage.removeItem("player");
+    window.location.reload();
+  }
+}
+
 /* 🔥 SOLUÇÃO MANTIDA: FUNÇÃO UNIFICADA PARA BLOQUEIO DE BOTÕES */
 function toggleAllButtons(disable, activeAction = null) {
   if (disable) {
@@ -380,6 +398,41 @@ function scrollToBottom(element) {
   }
 }
 
+/**
+ * 💣 FUNÇÃO PARA LIMPAR TODO O BANCO DE DADOS
+ * Esta função percorre as coleções principais e deleta todos os documentos.
+ */
+async function clearAllCollections() {
+  const collectionsToClear = [
+    "players",
+    "organizers",
+    "drawResults",
+    "counters",
+  ];
+  const batch = writeBatch(firestore);
+  let totalDeleted = 0;
+
+  try {
+    for (const collectionName of collectionsToClear) {
+      const querySnapshot = await getDocs(
+        collection(firestore, collectionName)
+      );
+
+      querySnapshot.forEach((document) => {
+        const docRef = doc(firestore, collectionName, document.id);
+        batch.delete(docRef);
+        totalDeleted++;
+      });
+    }
+
+    if (totalDeleted > 0) {
+      await batch.commit();
+    }
+  } catch (error) {
+    console.error("Erro ao limpar coleções:", error);
+  }
+}
+
 /* INICIALIZAÇÃO */
 export async function loadOrganizerScreen() {
   await fetchData();
@@ -388,3 +441,4 @@ export async function loadOrganizerScreen() {
 /* EVENTOS */
 updateBtn.addEventListener("click", handleUpdateClick);
 drawBtn.addEventListener("click", handleDrawClick);
+resetBtn.addEventListener("click", handleResetClick);
