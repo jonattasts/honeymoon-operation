@@ -254,9 +254,14 @@ async function checkOrganizerExists() {
 }
 
 function formatName(rawName) {
-  const lowercaseWords = ["da", "de", "do", "dos", "das", "e"];
+  // Remove qualquer coisa que não seja letra (com acento) ou espaço
+  const sanitized = rawName.replace(
+    /[^a-zA-ZáàâãéèêíïóôõöúçñÁÀÂÃÉÈÊÍÏÓÔÕÖÚÇÑ\s]/g,
+    ""
+  );
 
-  return rawName
+  const lowercaseWords = ["da", "de", "do", "dos", "das", "e"];
+  return sanitized
     .trim()
     .split(/\s+/)
     .slice(0, 2)
