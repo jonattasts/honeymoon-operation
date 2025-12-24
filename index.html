@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Operação Lua de Mel de Jhon & Rê 💏💍</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- HOME -->
+    <section id="home" class="screen active">
+      <div class="split-container">
+        <div class="left-image"></div>
+
+        <div class="right-form">
+          <div class="form-wrapper">
+            <img class="monograma" src="./assets/monograma.jpeg" />
+
+            <h2>
+              Bem vindo(a) a operação Lua mel de <br />
+              Jhon & Rê 💏💍
+            </h2>
+
+            <p>
+              Esta é a chave pix para você comprar seu bilhete e participar<br />
+              <strong>Chave Pix: jhon.e.reh27@gmail.com</strong>
+            </p>
+
+            <input
+              type="text"
+              id="nameInput"
+              placeholder="Digite seu nome e sobrenome"
+            />
+
+            <button id="enterBtn" disabled>Entrar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLAYER -->
+    <section id="player" class="screen">
+      <div class="player-container">
+        <div id="playerGameContent" class="hidden">
+          <h2 class="player-name">
+            Boa sorte <span id="playerName"></span> 🍀🤩
+          </h2>
+
+          <h3 class="section-title">
+            Últimos números chamados <span class="icon">🔢</span>
+          </h3>
+          <div id="lastNumbers" class="numbers-row"></div>
+
+          <h3 class="section-title">
+            Esses são os números da sua tabela <span class="icon">🧮</span>
+          </h3>
+
+          <div id="playerTable" class="numbers-row"></div>
+        </div>
+
+        <button id="updateBtn" class="btn">
+          Atualizar
+          <div class="loader hidden"></div>
+        </button>
+
+        <div id="winnerMessage" class="hidden">
+          <div
+            class="form-wrapper"
+            style="text-align: center; padding-top: 80px"
+          >
+            <h2 style="font-size: 28px; color: #2b78d6">
+              Operação lua de mel concluída com sucesso!!! 🥳
+            </h2>
+            <p style="font-size: 18px; color: #7a7a7a">
+              Parabéns <strong id="winnerNameDisplay"></strong>, você foi o(a)
+              vencedor(a)!
+            </p>
+            <div style="margin-top: 40px; font-size: 120px">🏆</div>
+          </div>
+        </div>
+
+        <div id="gameOverMessage" class="hidden">
+          <div
+            class="form-wrapper"
+            style="text-align: center; padding-top: 80px"
+          >
+            <h2 style="font-size: 28px; color: #2b78d6">
+              Operação lua de mel finalizada 🥳
+            </h2>
+            <p style="font-size: 18px; color: #7a7a7a">
+              Obrigado <strong id="loserNameDisplay"></strong> por se divertir
+              conosco!
+            </p>
+            <div style="margin-top: 40px; font-size: 120px">🤩</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ORGANIZER -->
+    <section id="organizer" class="screen">
+      <div class="organizer-container">
+        <div class="organizer-wrapper">
+          <div class="organizer-left" style="flex: 1">
+            <h3 style="margin-bottom: 12px">Jogadores 🎮</h3>
+            <div id="playersList" style="font-size: 14px; color: #2b78d6"></div>
+          </div>
+
+          <div class="organizer-right" style="flex: 1">
+            <h3 style="margin-bottom: 12px">Últimos números 🔢</h3>
+            <div id="lastNumbersContainer" class="numbers-row small"></div>
+          </div>
+        </div>
+
+        <h3 style="text-align: center; margin-bottom: 24px">
+          Classificação 🏆
+        </h3>
+
+        <div id="organizerRankingList"></div>
+
+        <div class="organizer-buttons">
+          <button id="updateOrganizerBtn" class="btn btn-outline">
+            Atualizar
+          </button>
+
+          <button id="drawNumberBtn" class="btn">Sortear</button>
+        </div>
+      </div>
+    </section>
+
+    <div id="toast" class="toast hidden">
+      O evento ainda não está disponível, aguarde o organizador entrar!
+    </div>
+
+    <script type="module" src="home.js"></script>
+    <script type="module" src="player.js"></script>
+    <script type="module" src="organizer.js"></script>
+  </body>
+</html>
