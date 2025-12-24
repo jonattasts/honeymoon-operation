@@ -15,20 +15,22 @@ import { loadOrganizerScreen } from "./organizer.js";
 /* ELEMENTOS */
 const nameInput = document.getElementById("nameInput");
 const enterBtn = document.getElementById("enterBtn");
-// Ajustado para selecionar o loader criado dinamicamente ou o elemento correto
-const spinner = document.querySelector(".full-screen-loader");
+// Seleciona o loader que já existe no seu HTML
+const fullScreenLoader = document.querySelector(".full-screen-loader");
 
-// 🟢 CRIAÇÃO DO LOADER DE TELA CHEIA (OVERLAY) VIA CLASSE CSS
-const fullScreenLoader = document.createElement("div");
-fullScreenLoader.id = "initial-preloader";
-fullScreenLoader.classList.add("full-screen-loader");
+/* ELEMENTOS PARA MODO ORGANIZADOR */
+const passwordInput = document.getElementById("passwordInput");
+const backBtn = document.getElementById("backBtn");
+const pixInfo = document.getElementById("pixInfo");
+const formTitle = document.getElementById("formTitle");
 
-// Adicionando o spinner visual dentro do loader (ajuste opcional para garantir visibilidade)
+let isPasswordMode = false; // Controla se estamos na tela de senha
+
+// Adicionando o spinner visual dentro do loader de tela cheia existente
 const innerSpinner = document.createElement("div");
 innerSpinner.className = "loader";
 innerSpinner.style.color = "#2b78d6";
 fullScreenLoader.appendChild(innerSpinner);
-document.body.appendChild(fullScreenLoader);
 
 /* 🚀 LÓGICA DE PERSISTÊNCIA (AUTO-LOGIN) COM DELAY DE 2s */
 async function initSession() {
@@ -37,11 +39,8 @@ async function initSession() {
 
   const playerStorage = JSON.parse(localStorage.getItem("player"));
 
-  // Garante que o loading dure pelo menos 2 segundos
+  // Garante que o loading de entrada dure pelo menos 2 segundos
   await new Promise((resolve) => setTimeout(resolve, 2000));
-
-  // Verifica se o spinner existe antes de tentar acessar classList
-  if (spinner) spinner.classList.add("hidden");
 
   let screenToLoad = "home"; // Tela padrão inicial
 
@@ -78,31 +77,59 @@ async function initSession() {
 
   // 🛡️ SÓ HABILITA O BOTÃO SE A TELA CARREGADA FOR A HOME (ERRO OU AUSÊNCIA DE SESSÃO)
   if (screenToLoad === "home") {
-    // Verifica se já existe texto no input para respeitar a lógica de preenchimento
-    const filled = nameInput.value.trim().length > 0;
-    enterBtn.disabled = !filled;
-    if (filled) enterBtn.classList.add("enabled");
+    checkInputs();
   }
 }
 
 function hideInitialLoading() {
-  const preloader = document.getElementById("initial-preloader");
-  if (preloader) {
-    preloader.classList.add("loader-hidden");
-    // Remove do DOM após a transição do CSS (0.5s)
-    setTimeout(() => preloader.remove(), 500);
+  if (fullScreenLoader) {
+    fullScreenLoader.classList.add("loader-hidden");
+    // Remove do DOM após a transição do CSS
+    setTimeout(() => (fullScreenLoader.style.display = "none"), 500);
   }
 }
 
-// Executa a verificação ao carregar o script
-initSession();
+/* FUNÇÃO PARA ALTERNAR MODO SENHA */
+function togglePasswordMode(active) {
+  isPasswordMode = active;
+  if (active) {
+    // Esconde elementos de jogador
+    nameInput.style.display = "none";
+    if (pixInfo) pixInfo.style.display = "none";
 
-/* INPUT */
-nameInput.addEventListener("input", () => {
-  const filled = nameInput.value.trim().length > 0;
-  enterBtn.disabled = !filled;
-  enterBtn.classList.toggle("enabled", filled);
-});
+    // Mostra elementos de senha com animação
+    passwordInput.style.display = "block";
+    passwordInput.classList.add("fade-in");
+    backBtn.style.display = "block";
+    backBtn.classList.add("fade-in");
+
+    passwordInput.value = "";
+    enterBtn.disabled = true;
+    enterBtn.classList.remove("enabled");
+  } else {
+    // Volta ao normal
+    nameInput.style.display = "block";
+    if (pixInfo) pixInfo.style.display = "block";
+    passwordInput.style.display = "none";
+    passwordInput.classList.remove("fade-in");
+    backBtn.style.display = "none";
+    backBtn.classList.remove("fade-in");
+    checkInputs();
+  }
+}
+
+/* VALIDAÇÃO DE INPUTS */
+function checkInputs() {
+  if (isPasswordMode) {
+    const filled = passwordInput.value.length >= 6;
+    enterBtn.disabled = !filled;
+    enterBtn.classList.toggle("enabled", filled);
+  } else {
+    const filled = nameInput.value.trim().length > 0;
+    enterBtn.disabled = !filled;
+    enterBtn.classList.toggle("enabled", filled);
+  }
+}
 
 /* 🔢 ID SEQUENCIAL (JOGADORES) */
 async function getNextUserId() {
@@ -178,11 +205,8 @@ async function enterOrCreatePlayer(name) {
 
   if (existingPlayer) {
     savePlayerToStorage(existingPlayer);
-
     await loadPlayerScreen();
-
     showScreen("player");
-
     return;
   }
 
@@ -200,9 +224,7 @@ async function enterOrCreatePlayer(name) {
 
   await addDoc(collection(firestore, "players"), player);
   savePlayerToStorage(player);
-
   await loadPlayerScreen();
-
   showScreen("player");
 }
 
@@ -212,21 +234,16 @@ async function handleOrganizerLogin(name) {
 
   if (!exists) {
     const id = await getNextUserId();
-
     const organizer = {
       id,
       name,
       createdAt: new Date(),
     };
-
     await addDoc(collection(firestore, "organizers"), organizer);
   }
 
-  // Salva o organizador no storage para manter a sessão ao atualizar
   savePlayerToStorage({ name: "Organizador", isOrganizer: true });
-
   await loadOrganizerScreen();
-
   showScreen("organizer");
 }
 
@@ -245,29 +262,37 @@ function formatName(rawName) {
     .slice(0, 2)
     .map((word) => {
       const lower = word.toLocaleLowerCase("pt-BR");
-
-      if (lowercaseWords.includes(lower)) {
-        return lower;
-      }
-
+      if (lowercaseWords.includes(lower)) return lower;
       return lower.charAt(0).toLocaleUpperCase("pt-BR") + lower.slice(1);
     })
     .join(" ");
 }
 
-/* EVENTOS */
 async function handleEnterClick() {
   const rawName = nameInput.value.trim();
   if (!rawName) return;
 
   const name = formatName(rawName);
 
+  // 🔐 SE FOR ORGANIZADOR E NÃO ESTIVER NO MODO SENHA
+  if (name.toLowerCase() === "organizador" && !isPasswordMode) {
+    togglePasswordMode(true);
+    return;
+  }
+
+  // 🔐 VALIDAÇÃO DA SENHA SE ESTIVER NO MODO SENHA
+  if (isPasswordMode) {
+    if (passwordInput.value !== "eles se amam") {
+      showToast("Senha do organizador incorreta!");
+      return;
+    }
+  }
+
   // 🔄 ESTADO DE CARREGAMENTO NO BOTÃO
   const originalText = enterBtn.textContent;
   enterBtn.disabled = true;
   enterBtn.textContent = "";
 
-  // Cria o loader para o botão
   const btnLoader = document.createElement("div");
   btnLoader.className = "loader";
   btnLoader.style.width = "20px";
@@ -276,10 +301,10 @@ async function handleEnterClick() {
   enterBtn.appendChild(btnLoader);
 
   try {
-    // Delay obrigatório de 2 segundos solicitado
+    // Delay de 2 segundos solicitado
     await new Promise((r) => setTimeout(r, 2000));
 
-    if (name === "Organizador") {
+    if (name.toLowerCase() === "organizador") {
       await handleOrganizerLogin(name);
       return;
     }
@@ -289,8 +314,7 @@ async function handleEnterClick() {
       showToast(
         "O evento ainda não está disponível, aguarde o organizador entrar!"
       );
-      // REVERTE BOTÃO EM CASO DE "ERRO" (Evento indisponível)
-      enterBtn.innerHTML = originalText;
+      enterBtn.innerHTML = "Entrar"; // Restaura o texto original
       enterBtn.disabled = false;
       return;
     }
@@ -298,10 +322,17 @@ async function handleEnterClick() {
     await enterOrCreatePlayer(name);
   } catch (error) {
     console.error("Erro ao entrar:", error);
-    // REVERTE BOTÃO EM CASO DE ERRO TÉCNICO
-    enterBtn.innerHTML = originalText;
+    enterBtn.innerHTML = "Entrar";
     enterBtn.disabled = false;
   }
 }
 
+/* EVENTOS */
+
+nameInput.addEventListener("input", checkInputs);
+passwordInput.addEventListener("input", checkInputs);
 enterBtn.addEventListener("click", handleEnterClick);
+backBtn.addEventListener("click", () => togglePasswordMode(false));
+
+// Inicia a verificação de sessão
+initSession();

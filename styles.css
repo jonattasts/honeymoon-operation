@@ -430,7 +430,8 @@ div.ranking-player-name {
 
 /* Aplicação da animação nas mensagens de fim de jogo */
 #winnerMessage,
-#gameOverMessage {
+#gameOverMessage,
+.fade-in {
   animation: fadeIn 1s ease-in-out forwards;
   /* '1s' define a duração solicitada */
   /* 'ease-in-out' torna a transição mais orgânica */

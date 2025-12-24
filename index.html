@@ -18,15 +18,17 @@
           <div class="form-wrapper">
             <img class="monograma" src="./assets/monograma.jpeg" />
 
-            <h2>
+            <h2 id="formTitle">
               Bem vindo(a) a operação Lua mel de <br />
               Jhon & Rê 💏💍
             </h2>
 
-            <p>
-              Esta é a chave pix para você comprar seu bilhete e participar<br />
-              <strong>Chave Pix: jhon.e.reh27@gmail.com</strong>
-            </p>
+            <div id="pixInfo">
+              <p>
+                Esta é a chave pix para você comprar seu bilhete e participar<br />
+                <strong>Chave Pix: jhon.e.reh27@gmail.com</strong>
+              </p>
+            </div>
 
             <input
               type="text"
@@ -34,7 +36,23 @@
               placeholder="Digite seu nome e sobrenome"
             />
 
+            <input
+              type="password"
+              id="passwordInput"
+              placeholder="Digite a senha do organizador"
+              class="hidden-element"
+              style="display: none"
+            />
+
             <button id="enterBtn" disabled>Entrar</button>
+
+            <button
+              id="backBtn"
+              class="btn-outline hidden-element"
+              style="display: none; margin-top: 10px; width: 100%"
+            >
+              Voltar
+            </button>
           </div>
         </div>
       </div>
