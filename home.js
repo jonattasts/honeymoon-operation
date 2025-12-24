@@ -15,6 +15,7 @@ import { loadOrganizerScreen } from "./organizer.js";
 /* ELEMENTOS */
 const nameInput = document.getElementById("nameInput");
 const enterBtn = document.getElementById("enterBtn");
+// Ajustado para selecionar o loader criado dinamicamente ou o elemento correto
 const spinner = document.querySelector(".full-screen-loader");
 
 // 🟢 CRIAÇÃO DO LOADER DE TELA CHEIA (OVERLAY) VIA CLASSE CSS
@@ -22,13 +23,25 @@ const fullScreenLoader = document.createElement("div");
 fullScreenLoader.id = "initial-preloader";
 fullScreenLoader.classList.add("full-screen-loader");
 
+// Adicionando o spinner visual dentro do loader (ajuste opcional para garantir visibilidade)
+const innerSpinner = document.createElement("div");
+innerSpinner.className = "loader";
+innerSpinner.style.color = "#2b78d6";
+fullScreenLoader.appendChild(innerSpinner);
+document.body.appendChild(fullScreenLoader);
+
 /* 🚀 LÓGICA DE PERSISTÊNCIA (AUTO-LOGIN) COM DELAY DE 2s */
 async function initSession() {
+  // Desabilita o botão logo no início da validação
+  enterBtn.disabled = true;
+
   const playerStorage = JSON.parse(localStorage.getItem("player"));
 
   // Garante que o loading dure pelo menos 2 segundos
   await new Promise((resolve) => setTimeout(resolve, 2000));
-  spinner.classList.add("hidden");
+
+  // Verifica se o spinner existe antes de tentar acessar classList
+  if (spinner) spinner.classList.add("hidden");
 
   let screenToLoad = "home"; // Tela padrão inicial
 
@@ -62,6 +75,14 @@ async function initSession() {
   // Finaliza o loading e exibe a tela correta
   hideInitialLoading();
   showScreen(screenToLoad);
+
+  // 🛡️ SÓ HABILITA O BOTÃO SE A TELA CARREGADA FOR A HOME (ERRO OU AUSÊNCIA DE SESSÃO)
+  if (screenToLoad === "home") {
+    // Verifica se já existe texto no input para respeitar a lógica de preenchimento
+    const filled = nameInput.value.trim().length > 0;
+    enterBtn.disabled = !filled;
+    if (filled) enterBtn.classList.add("enabled");
+  }
 }
 
 function hideInitialLoading() {
@@ -241,20 +262,46 @@ async function handleEnterClick() {
 
   const name = formatName(rawName);
 
-  if (name === "Organizador") {
-    await handleOrganizerLogin(name);
-    return;
-  }
+  // 🔄 ESTADO DE CARREGAMENTO NO BOTÃO
+  const originalText = enterBtn.textContent;
+  enterBtn.disabled = true;
+  enterBtn.textContent = "";
 
-  const organizerExists = await checkOrganizerExists();
-  if (!organizerExists) {
-    showToast(
-      "O evento ainda não está disponível, aguarde o organizador entrar!"
-    );
-    return;
-  }
+  // Cria o loader para o botão
+  const btnLoader = document.createElement("div");
+  btnLoader.className = "loader";
+  btnLoader.style.width = "20px";
+  btnLoader.style.height = "20px";
+  btnLoader.style.borderWidth = "2px";
+  enterBtn.appendChild(btnLoader);
 
-  await enterOrCreatePlayer(name);
+  try {
+    // Delay obrigatório de 2 segundos solicitado
+    await new Promise((r) => setTimeout(r, 2000));
+
+    if (name === "Organizador") {
+      await handleOrganizerLogin(name);
+      return;
+    }
+
+    const organizerExists = await checkOrganizerExists();
+    if (!organizerExists) {
+      showToast(
+        "O evento ainda não está disponível, aguarde o organizador entrar!"
+      );
+      // REVERTE BOTÃO EM CASO DE "ERRO" (Evento indisponível)
+      enterBtn.innerHTML = originalText;
+      enterBtn.disabled = false;
+      return;
+    }
+
+    await enterOrCreatePlayer(name);
+  } catch (error) {
+    console.error("Erro ao entrar:", error);
+    // REVERTE BOTÃO EM CASO DE ERRO TÉCNICO
+    enterBtn.innerHTML = originalText;
+    enterBtn.disabled = false;
+  }
 }
 
 enterBtn.addEventListener("click", handleEnterClick);
