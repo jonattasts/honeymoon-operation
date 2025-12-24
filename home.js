@@ -15,6 +15,66 @@ import { loadOrganizerScreen } from "./organizer.js";
 /* ELEMENTOS */
 const nameInput = document.getElementById("nameInput");
 const enterBtn = document.getElementById("enterBtn");
+const spinner = document.querySelector(".full-screen-loader");
+
+// 🟢 CRIAÇÃO DO LOADER DE TELA CHEIA (OVERLAY) VIA CLASSE CSS
+const fullScreenLoader = document.createElement("div");
+fullScreenLoader.id = "initial-preloader";
+fullScreenLoader.classList.add("full-screen-loader");
+
+/* 🚀 LÓGICA DE PERSISTÊNCIA (AUTO-LOGIN) COM DELAY DE 2s */
+async function initSession() {
+  const playerStorage = JSON.parse(localStorage.getItem("player"));
+
+  // Garante que o loading dure pelo menos 2 segundos
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  spinner.classList.add("hidden");
+
+  let screenToLoad = "home"; // Tela padrão inicial
+
+  if (playerStorage && playerStorage.name) {
+    try {
+      // Verifica se é o Organizador salvo
+      if (playerStorage.name === "Organizador") {
+        const organizerExists = await checkOrganizerExists();
+        if (organizerExists) {
+          await loadOrganizerScreen();
+          screenToLoad = "organizer";
+        }
+      } else {
+        // Verifica se é um Jogador comum salvo
+        const playerDoc = await findPlayerByName(playerStorage.name);
+        if (playerDoc) {
+          // Atualiza o storage com dados frescos do banco (ex: nova cartela)
+          savePlayerToStorage(playerDoc);
+          await loadPlayerScreen();
+          screenToLoad = "player";
+        } else {
+          // Jogador não existe mais no banco (foi excluído)
+          localStorage.removeItem("player");
+        }
+      }
+    } catch (error) {
+      console.error("Erro na validação de sessão:", error);
+    }
+  }
+
+  // Finaliza o loading e exibe a tela correta
+  hideInitialLoading();
+  showScreen(screenToLoad);
+}
+
+function hideInitialLoading() {
+  const preloader = document.getElementById("initial-preloader");
+  if (preloader) {
+    preloader.classList.add("loader-hidden");
+    // Remove do DOM após a transição do CSS (0.5s)
+    setTimeout(() => preloader.remove(), 500);
+  }
+}
+
+// Executa a verificação ao carregar o script
+initSession();
 
 /* INPUT */
 nameInput.addEventListener("input", () => {
@@ -98,7 +158,7 @@ async function enterOrCreatePlayer(name) {
   if (existingPlayer) {
     savePlayerToStorage(existingPlayer);
 
-    loadPlayerScreen();
+    await loadPlayerScreen();
 
     showScreen("player");
 
@@ -120,7 +180,7 @@ async function enterOrCreatePlayer(name) {
   await addDoc(collection(firestore, "players"), player);
   savePlayerToStorage(player);
 
-  loadPlayerScreen();
+  await loadPlayerScreen();
 
   showScreen("player");
 }
@@ -141,7 +201,10 @@ async function handleOrganizerLogin(name) {
     await addDoc(collection(firestore, "organizers"), organizer);
   }
 
-  loadOrganizerScreen();
+  // Salva o organizador no storage para manter a sessão ao atualizar
+  savePlayerToStorage({ name: "Organizador", isOrganizer: true });
+
+  await loadOrganizerScreen();
 
   showScreen("organizer");
 }
