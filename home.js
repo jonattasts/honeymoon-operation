@@ -17,6 +17,7 @@ const nameInput = document.getElementById("nameInput");
 const enterBtn = document.getElementById("enterBtn");
 // Seleciona o loader que já existe no seu HTML
 const fullScreenLoader = document.querySelector(".full-screen-loader");
+const pixKey = document.getElementById("pixKey");
 
 /* ELEMENTOS PARA MODO ORGANIZADOR */
 const passwordInput = document.getElementById("passwordInput");
@@ -74,6 +75,23 @@ async function initSession() {
   // Finaliza o loading e exibe a tela correta
   hideInitialLoading();
   showScreen(screenToLoad);
+
+  if (pixKey) {
+    pixKey.addEventListener("click", () => {
+      const pixText = "jhon.e.reh27@gmail.com";
+
+      // Copia para a área de transferência
+      navigator.clipboard
+        .writeText(pixText)
+        .then(() => {
+          // Exibe o toast personalizado
+          showCopyToast("Chave Pix copiada com sucesso!");
+        })
+        .catch((err) => {
+          console.error("Erro ao copiar: ", err);
+        });
+    });
+  }
 
   // 🛡️ SÓ HABILITA O BOTÃO SE A TELA CARREGADA FOR A HOME (ERRO OU AUSÊNCIA DE SESSÃO)
   if (screenToLoad === "home") {
@@ -330,6 +348,28 @@ async function handleEnterClick() {
     enterBtn.innerHTML = "Entrar";
     enterBtn.disabled = false;
   }
+}
+
+function showCopyToast(message) {
+  const toast = document.getElementById("toast");
+
+  // Define as cores solicitadas: Fundo azul, letra branca
+  toast.style.backgroundColor = "#18ab40";
+  toast.style.color = "#ffffff";
+  toast.textContent = message;
+
+  // Mostra o toast
+  toast.classList.remove("hidden");
+
+  // Esconde após 3 segundos e reseta a cor original (se necessário)
+  setTimeout(() => {
+    toast.classList.add("hidden");
+    // Opcional: voltar para a cor vermelha padrão do seu CSS após fechar
+    setTimeout(() => {
+      toast.style.backgroundColor = "";
+      toast.style.color = "";
+    }, 300);
+  }, 3000);
 }
 
 /* EVENTOS */

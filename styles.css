@@ -27,6 +27,107 @@ body {
   height: 100vh;
 }
 
+/* CONTAINER PRINCIPAL DA HOME */
+.form-wrapper {
+  width: 100%;
+  max-width: 380px;
+  padding: 0px 24px;
+  text-align: center;
+}
+
+.main-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 450px; /* Limite para parecer app mobile no desktop */
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+/* IMAGEM DE TOPO ARREDONDADA */
+.hero-bg-container {
+  width: 100%;
+  height: 45vh; /* Altura da imagem */
+  background-color: #ffffff;
+}
+
+.hero-image-rounded {
+  width: 100%;
+  height: 100%;
+  background-image: url("./assets/background-image.jpg");
+  background-size: cover;
+  background-position: bottom;
+
+  /* Arredonda apenas os cantos inferiores */
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+
+  /* Garante que os cantos superiores fiquem retos */
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+/* SOBREPOSIÇÃO DO CONTEÚDO */
+.content-overlay {
+  position: relative;
+  margin-top: -80px; /* Faz o formulário subir sobre a foto */
+  padding: 0 20px 40px;
+  z-index: 10;
+}
+
+/* CARTÃO GLASSMORPHISM */
+.glass-card {
+  background: rgba(255, 255, 255, 0.4); /* Transparência */
+  backdrop-filter: blur(3px); /* Efeito de desfoque */
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 30px;
+  padding: 30px 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* AJUSTES DE ELEMENTOS INTERNOS */
+.monograma {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 15px;
+  border: 4px solid #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  color: #1a4a8e; /* Azul mais escuro para contraste no vidro */
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+#pixInfo p {
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* BOTAO ENTRAR (AZUL DO TEMPLATE) */
+#enterBtn.enabled {
+  background: #2b78d6;
+  border: none;
+  font-weight: 600;
+  transition: transform 0.2s;
+}
+
+#enterBtn:active {
+  transform: scale(0.98);
+}
+
+#pixInfo:hover {
+  opacity: 0.8;
+  transform: scale(1.02);
+  transition: all 0.2s ease;
+}
+
 /* TEXTOS */
 
 h2.player-name {
@@ -97,6 +198,10 @@ button.enabled {
   opacity: 0;
   pointer-events: none;
   transform: translateX(-50%) translateY(10px);
+}
+
+.toast {
+  transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
 }
 
 /* PLAYER */
@@ -477,99 +582,4 @@ div#gameOverMessage .form-wrapper {
     width: 100%;
     height: 50vh;
   }
-}
-
-/* CONTAINER PRINCIPAL DA HOME */
-.form-wrapper {
-  width: 100%;
-  max-width: 380px;
-  padding: 0px 24px;
-  text-align: center;
-}
-
-.main-wrapper {
-  position: relative;
-  width: 100%;
-  max-width: 450px; /* Limite para parecer app mobile no desktop */
-  margin: 0 auto;
-  min-height: 100vh;
-  background-color: #ffffff;
-  overflow: hidden;
-}
-
-/* IMAGEM DE TOPO ARREDONDADA */
-.hero-bg-container {
-  width: 100%;
-  height: 45vh; /* Altura da imagem */
-  background-color: #ffffff;
-}
-
-.hero-image-rounded {
-  width: 100%;
-  height: 100%;
-  background-image: url("./assets/background-image.jpg");
-  background-size: cover;
-  background-position: bottom;
-
-  /* Arredonda apenas os cantos inferiores */
-  border-bottom-left-radius: 30px;
-  border-bottom-right-radius: 30px;
-
-  /* Garante que os cantos superiores fiquem retos */
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
-
-/* SOBREPOSIÇÃO DO CONTEÚDO */
-.content-overlay {
-  position: relative;
-  margin-top: -80px; /* Faz o formulário subir sobre a foto */
-  padding: 0 20px 40px;
-  z-index: 10;
-}
-
-/* CARTÃO GLASSMORPHISM */
-.glass-card {
-  background: rgba(255, 255, 255, 0.4); /* Transparência */
-  backdrop-filter: blur(3px); /* Efeito de desfoque */
-  -webkit-backdrop-filter: blur(15px);
-  border-radius: 30px;
-  padding: 30px 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-/* AJUSTES DE ELEMENTOS INTERNOS */
-.monograma {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 15px;
-  border: 4px solid #fff;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-h2 {
-  color: #1a4a8e; /* Azul mais escuro para contraste no vidro */
-  font-size: 16px;
-  line-height: 1.4;
-}
-
-#pixInfo p {
-  font-size: 13px;
-  line-height: 1.5;
-  margin-bottom: 20px;
-}
-
-/* BOTAO ENTRAR (AZUL DO TEMPLATE) */
-#enterBtn.enabled {
-  background: #2b78d6;
-  border: none;
-  font-weight: 600;
-  transition: transform 0.2s;
-}
-
-#enterBtn:active {
-  transform: scale(0.98);
 }
