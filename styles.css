@@ -30,9 +30,9 @@ body {
 /* IMAGEM ESQUERDA */
 .left-image {
   width: 50%;
-  background-image: url("./assets/background-image.jpeg");
+  background-image: url("./assets/background-image.jpg");
   background-size: cover;
-  background-position: center;
+  background-position: bottom;
 }
 
 /* FORMULÁRIO DIREITA */
