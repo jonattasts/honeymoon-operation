@@ -103,7 +103,7 @@ function hideInitialLoading() {
   if (fullScreenLoader) {
     fullScreenLoader.classList.add("loader-hidden");
     // Remove do DOM após a transição do CSS
-    setTimeout(() => (fullScreenLoader.style.display = "none"), 500);
+    fullScreenLoader.style.display = "none";
   }
 }
 
@@ -192,7 +192,7 @@ function generateUniqueTable(existingTables) {
   do {
     const numbers = shuffle(Array.from({ length: 100 }, (_, i) => i + 1)).slice(
       0,
-      TOTAL - NULLS
+      TOTAL - NULLS,
     );
 
     const slots = shuffle([...Array(TOTAL).keys()]);
@@ -275,7 +275,7 @@ function formatName(rawName) {
   // Remove qualquer coisa que não seja letra (com acento) ou espaço
   const sanitized = rawName.replace(
     /[^a-zA-ZáàâãéèêíïóôõöúçñÁÀÂÃÉÈÊÍÏÓÔÕÖÚÇÑ\s]/g,
-    ""
+    "",
   );
 
   const lowercaseWords = ["da", "de", "do", "dos", "das", "e"];
@@ -335,7 +335,7 @@ async function handleEnterClick() {
     const organizerExists = await checkOrganizerExists();
     if (!organizerExists) {
       showToast(
-        "O evento ainda não está disponível, aguarde o organizador entrar!"
+        "O evento ainda não está disponível, aguarde o organizador entrar!",
       );
       enterBtn.innerHTML = "Entrar"; // Restaura o texto original
       enterBtn.disabled = false;

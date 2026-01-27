@@ -39,16 +39,6 @@ export async function loadPlayerScreen() {
 
   const playerStorage = JSON.parse(localStorage.getItem("player")) || {};
 
-  // 🎯 VERIFICAÇÃO DE VENCEDOR NA KEY SEPARADA
-  if (serverWinner) {
-    localStorage.setItem("gameWinner", serverWinner);
-    stopLoading();
-    handleFinalDisplay(serverWinner, playerStorage.name);
-    return;
-  } else {
-    localStorage.removeItem("gameWinner");
-  }
-
   // ✅ EXIBE O CONTEÚDO DO JOGO (Mantendo os títulos do HTML)
   if (playerGameContent) playerGameContent.classList.remove("hidden");
 
@@ -59,26 +49,40 @@ export async function loadPlayerScreen() {
     renderPlayerTable(calledNumbers);
   }
 
-  stopLoading();
+  // 🎯 VERIFICAÇÃO DE VENCEDOR NA KEY SEPARADA
+  if (serverWinner) {
+    localStorage.setItem("gameWinner", serverWinner);
+
+    handleFinalDisplay(serverWinner, playerStorage.name);
+    return;
+  } else {
+    // setTimeout(() => {
+      localStorage.removeItem("gameWinner");
+      stopLoading();
+    // }, 200);
+  }
 }
 
 /* UI — CONTROLE DE EXIBIÇÃO FINAL */
 function handleFinalDisplay(winnerName, currentPlayerName) {
-  if (playerGameContent) playerGameContent.classList.add("hidden");
-  if (updateBtn) updateBtn.classList.add("hidden");
-
   const firstName = currentPlayerName
     ? currentPlayerName.trim().split(/\s+/)[0]
     : "Jogador";
-  const savedWinner = localStorage.getItem("gameWinner");
 
-  if (savedWinner === currentPlayerName) {
-    if (winnerNameDisplay) winnerNameDisplay.textContent = firstName;
-    if (winnerMessage) winnerMessage.classList.remove("hidden");
-  } else {
-    if (loserNameDisplay) loserNameDisplay.textContent = firstName;
-    if (gameOverMessage) gameOverMessage.classList.remove("hidden");
-  }
+  setTimeout(() => {
+    if (playerGameContent) playerGameContent.classList.add("hidden");
+    if (updateBtn) updateBtn.classList.add("hidden");
+
+    stopLoading();
+
+    if (winnerName === currentPlayerName) {
+      if (winnerNameDisplay) winnerNameDisplay.textContent = firstName;
+      if (winnerMessage) winnerMessage.classList.remove("hidden");
+    } else {
+      if (loserNameDisplay) loserNameDisplay.textContent = firstName;
+      if (gameOverMessage) gameOverMessage.classList.remove("hidden");
+    }
+  }, 2000);
 }
 
 /* 🔥 FIRESTORE */
@@ -217,6 +221,7 @@ async function stopLoading() {
   document.body.appendChild(loader);
 
   const drawData = await fetchDrawResults();
+
   if (!drawData.winner) {
     updateBtn.textContent = "Atualizar";
     updateBtn.disabled = false;
