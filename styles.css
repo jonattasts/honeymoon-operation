@@ -289,10 +289,7 @@ button.enabled {
 
 /* Número vazio */
 .number-circle-empty {
-  width: 56px;
-
-  margin-top: -8px;
-  margin-left: -4px;
+  width: 50px;
 }
 
 /* Botão atualizar */
