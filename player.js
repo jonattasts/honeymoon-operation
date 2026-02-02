@@ -57,8 +57,8 @@ export async function loadPlayerScreen() {
     return;
   } else {
     // setTimeout(() => {
-      localStorage.removeItem("gameWinner");
-      stopLoading();
+    localStorage.removeItem("gameWinner");
+    stopLoading();
     // }, 200);
   }
 }
@@ -130,11 +130,11 @@ async function renderPlayerTable(calledNumbers) {
   const playerStorage = JSON.parse(localStorage.getItem("player"));
   if (!playerStorage) return;
 
+  // Recupera os números que o jogador já marcou manualmente nesta sessão
+  let markedNumbers = JSON.parse(localStorage.getItem("markedNumbers")) || [];
+
   const player = await findPlayerByName(playerStorage.name);
-
-  if (!playerTableContainer) return;
-
-  if (!player || !player.tableNumbers) {
+  if (!playerTableContainer || !player || !player.tableNumbers) {
     playerTableContainer.innerHTML =
       "<span class='empty-message'>Cartela não encontrada. 🥲</span>";
     return;
@@ -144,9 +144,6 @@ async function renderPlayerTable(calledNumbers) {
   playerTableContainer.className = "numbers-row";
 
   const table = player.tableNumbers;
-  const lastCalled =
-    calledNumbers.length > 0 ? calledNumbers[calledNumbers.length - 1] : null;
-
   const rows = [table.slice(0, 6), table.slice(6, 12), table.slice(12, 18)];
   const winningRowsIndices = [];
 
@@ -169,22 +166,52 @@ async function renderPlayerTable(calledNumbers) {
       numberCircle.appendChild(img);
     } else {
       numberCircle.className = "number-circle";
+      numberCircle.style.cursor = "pointer";
       numberCircle.textContent = formatNumber(number);
 
-      if (calledNumbers.includes(number)) {
+      // 1. REGRA VERDE: Automática (Linha completa)
+      if (
+        winningRowsIndices.includes(rowIndex) &&
+        calledNumbers.includes(number)
+      ) {
+        numberCircle.classList.add("winner");
+      }
+      // 2. REGRA AZUL PERSISTENTE: Se o número já foi marcado e ainda consta como sorteado no banco
+      else if (
+        markedNumbers.includes(number) &&
+        calledNumbers.includes(number)
+      ) {
+        // Adiciona animação apenas no carregamento para feedback visual
         numberCircle.classList.add("called");
+        setTimeout(() => numberCircle.classList.remove("animate-point"), 600);
+      }
 
-        if (winningRowsIndices.includes(rowIndex)) {
-          numberCircle.classList.add("winner");
+      // LÓGICA DE CLIQUE MANUAL
+      numberCircle.addEventListener("click", () => {
+        if (
+          numberCircle.classList.contains("winner") ||
+          numberCircle.classList.contains("called")
+        ) {
+          return;
+        }
+
+        if (calledNumbers.includes(number)) {
+          // Adiciona visualmente
+          numberCircle.classList.add("called");
           numberCircle.classList.add("animate-point");
-        } else if (number === lastCalled && isProcessing) {
-          numberCircle.classList.add("animate-point");
+
+          // Salva no Storage para persistência
+          markedNumbers.push(number);
+          localStorage.setItem("markedNumbers", JSON.stringify(markedNumbers));
+
           setTimeout(() => {
             numberCircle.classList.remove("animate-point");
-            isProcessing = false;
-          }, 1500);
+          }, 600);
+        } else {
+          if (typeof showToast === "function")
+            showToast("Este número ainda não foi sorteado!");
         }
-      }
+      });
     }
     playerTableContainer.appendChild(numberCircle);
   });

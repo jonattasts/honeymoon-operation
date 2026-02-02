@@ -257,6 +257,7 @@ button.enabled {
   font-size: 15px;
   color: #5a6b7b;
   background: #ffffff;
+  cursor: pointer;
 }
 
 .number-circle.small {

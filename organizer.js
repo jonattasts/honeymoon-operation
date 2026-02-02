@@ -18,7 +18,7 @@ const updateBtn = document.getElementById("updateOrganizerBtn");
 const resetBtn = document.getElementById("resetGameBtn");
 let isProcessing = false;
 
-// 🔥 SOLUÇÃO MANTIDA: Garantindo que o botão inicie visível para permitir a carga mesmo sem jogadores
+// Garantindo que o botão inicie visível para permitir a carga mesmo sem jogadores
 if (updateBtn) {
   updateBtn.style.display = "block";
 }
@@ -176,7 +176,7 @@ function renderRanking() {
     numbers.className = "ranking-player-numbers";
     numbers.style.color = rowColor;
 
-    // 🔥 SOLUÇÃO MANTIDA: REMOÇÃO DE SCROLL PARA EXIBIÇÃO TOTAL
+    // REMOÇÃO DE SCROLL PARA EXIBIÇÃO TOTAL
     numbers.style.overflowY = "visible";
     numbers.style.height = "auto";
 
@@ -300,7 +300,7 @@ function generateRandomNumber() {
 async function handleUpdateClick() {
   if (isProcessing) return;
 
-  // 🔥 SOLUÇÃO MANTIDA: Bloqueia AMBOS os botões
+  // Bloqueia AMBOS os botões
   toggleAllButtons(true, "update");
 
   await fetchData();
@@ -309,11 +309,11 @@ async function handleUpdateClick() {
 }
 
 async function handleDrawClick() {
-  // 🔥 SOLUÇÃO MANTIDA: Impede a execução se não houver jogadores além do vencedor ou processamento
+  // Impede a execução se não houver jogadores além do vencedor ou processamento
   if (isProcessing || winner !== null || players.length === 0) return;
 
   try {
-    // 🔥 SOLUÇÃO MANTIDA: Bloqueia AMBOS os botões
+    // Bloqueia AMBOS os botões
     toggleAllButtons(true, "draw");
 
     const newNum = generateRandomNumber();
@@ -362,11 +362,12 @@ async function handleResetClick() {
     await clearAllCollections();
 
     localStorage.removeItem("player");
+    localStorage.removeItem("markedNumbers");
     window.location.reload();
   }
 }
 
-/* 🔥 SOLUÇÃO MANTIDA: FUNÇÃO UNIFICADA PARA BLOQUEIO DE BOTÕES */
+/* FUNÇÃO UNIFICADA PARA BLOQUEIO DE BOTÕES */
 function toggleAllButtons(disable, activeAction = null) {
   if (disable) {
     isProcessing = true;
