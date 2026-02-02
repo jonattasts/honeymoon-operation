@@ -305,7 +305,7 @@ async function handleEnterClick() {
 
   // 🔐 VALIDAÇÃO DA SENHA SE ESTIVER NO MODO SENHA
   if (isPasswordMode) {
-    if (passwordInput.value !== "eles se amam") {
+    if (passwordInput.value !== "organizer2026") {
       showToast("Senha do organizador incorreta!");
       return;
     }
